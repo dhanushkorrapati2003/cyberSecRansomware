@@ -108,7 +108,7 @@ This project simulates a modern ransomware workflow, integrating file encryption
 
 2. **Place the Payload on the Server**:
    - Copy the `encrypt.exe` file into the Web Server directory.
-   - Ensure the file name matches the one used in the macro (e.g., `http://127.0.0.1:5000/encrypt.exe`).
+   - Ensure the file name matches the one used in the macro (e.g., `http://127.0.0.1:5000/encrypt.exe`). Most likely, the name in the macro would be `ransomware.exe`.
 
 3. **Trigger the Attack**:
    - Open the Word document. The macro will:
