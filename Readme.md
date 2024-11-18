@@ -1,79 +1,154 @@
-# File Encryption Program
+Here’s an updated **README** tailored to your project, explaining how to build the source code, deploy the server, and simulate the attack using the Word document. 
 
-This program recursively encrypts all files in a specified folder using a combination of RSA and AES encryption. Each file is encrypted with a unique AES-256 key, and that key is then encrypted using a hardcoded RSA public key. The encrypted files are saved back in their original location, and the AES keys are stored in separate `.key` files.
+---
 
-## Features
-- **AES Encryption**: Each file is encrypted using AES-256 encryption.
-- **RSA Encryption**: The AES key for each file is encrypted using the RSA public key.
-- **Key Management**: Encrypted AES keys are saved in separate `.key` files for each encrypted file.
-- **Recursive Encryption**: All files in a folder, including those in subfolders, are encrypted.
-- **Self-Protection**: The program ensures that it does not encrypt its own executable file during the process.
+# **Ransomware Simulation Project**
 
-## Prerequisites
+This project simulates a modern ransomware workflow, integrating file encryption, payload delivery, and deployment via VBA macros. It demonstrates how ransomware can encrypt files on a target system and manage encryption keys using AES and RSA algorithms. The entire process is designed for **educational and research purposes only**.
 
-This program depends on the OpenSSL library. You will need to have OpenSSL installed to compile and run the code.
+---
 
-### Install OpenSSL
-- On **Ubuntu/Debian**:
-  ```bash
-  sudo apt-get install libssl-dev
-  ```
-- On **macOS** (with Homebrew):
-  ```bash
-  brew install openssl
-  ```
+## **Project Highlights**
+1. **Encryption Workflow**:
+   - Each file is encrypted with a unique AES-256 key.  
+   - AES keys are encrypted with a hardcoded RSA public key.  
+   - Files are overwritten with their encrypted versions, and encrypted AES keys are saved in `.key` files.
 
-## Compilation
+2. **Payload Delivery**:
+   - A **Flask Web Server** hosts the ransomware payload (`encrypt.exe`) for remote delivery.  
+   - The payload is downloaded and executed using a **VBA macro** embedded in a Word document.
 
-To compile this program, use `g++` with the necessary OpenSSL libraries. Run the following command:
+3. **Decryption Workflow**:
+   - Decryption is achieved using the corresponding RSA private key to unlock the AES keys and restore the original files.
 
-```bash
-g++ -o encryptor encryptor.cpp -lssl -lcrypto -std=c++17
+4. **Source Code**:
+   - The project provides C++ source code for the encryption and decryption executables.
+
+---
+
+## **Repository Structure**
+
+```plaintext
+├───Payload
+│   ├───Isolated Payload         # Contains isolated test files for encryption
+├───Webserver                    # Flask-based web server for payload delivery
+├───decrypt.cpp                  # C++ source code for the decryption program
+├───decrypt.exe                  # Compiled executable of the decryption program
+├───encrypt.cpp                  # C++ source code for the encryption program
+├───encrypt.exe                  # Compiled executable of the encryption program
+└───Readme.md                    # Documentation for the project
 ```
 
-This command assumes your code file is named `encryptor.cpp` and that OpenSSL libraries are properly linked.
+---
 
-## Usage
+## **How to Build the Encryption and Decryption Executables**
 
-1. **Run the Program**: To execute the program, provide the path to the folder you want to encrypt.
-   
+### **Requirements**
+- **C++ Compiler**: `g++` or any compiler that supports C++17 or later.
+- **OpenSSL Library**: Required for encryption and key management.
+  - Install OpenSSL:
+    - On Ubuntu/Debian:  
+      ```bash
+      sudo apt-get install libssl-dev
+      ```
+    - On macOS (via Homebrew):  
+      ```bash
+      brew install openssl
+      ```
+
+### **Steps to Build**
+
+1. **Navigate to the Source Code**:
    ```bash
-   ./encryptor /path/to/folder
+   cd /path/to/source/code
    ```
 
-   If no folder path is provided, the program will default to encrypting the current directory (`.`).
-
-2. **Encryption Process**:
-   - The program will generate an AES-256 key and IV for each file in the folder.
-   - It will encrypt each file using AES, then encrypt the AES key using the hardcoded RSA public key.
-   - The encrypted file will overwrite the original file.
-   - The encrypted AES key will be saved in a `.key` file alongside the encrypted file.
-
-3. **Example**:
+2. **Compile the Encryption Program**:
    ```bash
-   ./encryptor ./my_documents
+   g++ encrypt.cpp -o encrypt.exe -lssl -lcrypto -std=c++17
    ```
-   This will encrypt all files in the `./my_documents` directory.
+   This generates the `encrypt.exe` executable for file encryption.
 
-## Files Generated
-- **Encrypted Files**: Each file in the specified folder will be encrypted, and the original content will be replaced with the encrypted data.
-- **.key Files**: For each file that is encrypted, a corresponding `.key` file is generated in the same directory. The `.key` file contains the encrypted AES key used to decrypt the file.
+3. **Compile the Decryption Program**:
+   ```bash
+   g++ decrypt.cpp -o decrypt.exe -lssl -lcrypto -std=c++17
+   ```
+   This generates the `decrypt.exe` executable for file decryption.
 
-## Important Considerations
-- **Self-Protection**: The program checks its own executable file and skips it during encryption to prevent encrypting itself.
-- **Backup**: Make sure to have a backup of important files before running the program, as it overwrites the original files with encrypted versions.
+---
 
-## Error Handling
-- The program prints error messages if:
-  - It fails to open or read any file.
-  - It encounters problems during AES or RSA encryption.
-  - It fails to load the hardcoded RSA public key.
-  
-## Customization
+## **How to Use the Server and Payload**
 
-### Modifying the RSA Public Key
-The RSA public key is currently hardcoded in the source code. If you wish to use your own RSA public key, replace the content of `hardcoded_public_key_pem` in the code with your actual public key in PEM format.
+### **Setting Up the Flask Web Server**
 
-## License
+1. **Navigate to the Web Server Directory**:
+   ```bash
+   cd Webserver
+   ```
 
-This code is provided as-is without any warranty. You are free to modify and use it for educational or personal projects.
+2. **Install Flask**:
+   ```bash
+   pip install flask
+   ```
+
+3. **Run the Server**:
+   ```bash
+   python server.py
+   ```
+   - The server starts on `http://127.0.0.1:5000`.
+   - It hosts the `encrypt.exe` file for download by the Word document macro.
+
+---
+
+### **Simulating the Attack**
+
+1. **Prepare the Word Document**:
+   - Embed the VBA macro (`Document_Open`) in a Word document.
+   - The macro downloads the `encrypt.exe` file from the Flask server and executes it on the target system.
+
+2. **Place the Payload on the Server**:
+   - Copy the `encrypt.exe` file into the Web Server directory.
+   - Ensure the file name matches the one used in the macro (e.g., `http://127.0.0.1:5000/encrypt.exe`).
+
+3. **Trigger the Attack**:
+   - Open the Word document. The macro will:
+     - Download `encrypt.exe` from the server.
+     - Save it in a local folder and execute it.
+     - The encryption program starts encrypting files in the target directory.
+
+---
+
+## **Testing and Decryption**
+
+1. **Encrypt Files**:
+   - Run the encryption program manually for testing:
+     ```bash
+     ./encrypt.exe /path/to/test_folder
+     ```
+   - The program encrypts all files in the specified folder, saving encrypted AES keys in `.key` files.
+
+2. **Decrypt Files**:
+   - Use the decryption program with the RSA private key:
+     ```bash
+     ./decrypt.exe /path/to/test_folder
+     ```
+   - This restores the original files.
+
+---
+
+## **Important Notes**
+
+### **Controlled Environment**
+- Always test the project in a **controlled environment** such as a virtual machine.  
+- Do not execute the ransomware simulation on live systems or sensitive data.
+
+### **Backup**
+- Ensure backups of all test data are available, as the program overwrites files during encryption.
+
+### **Ethical Use**
+- This project is for **educational purposes only**. Misuse of the code or techniques is illegal and unethical.
+
+---
+
+## **License**
+This project is open-source and is provided "as-is" without any warranty. It is intended for **educational and research purposes only**. Misuse of this software is strictly prohibited.
